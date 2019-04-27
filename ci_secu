@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+go version || exit 1
+export PACKAGE_BIN=/usr/src/tools
+export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+
+gosec -sort -severity low ./...
+gosec -sort -severity medium ./...
+gosec -sort -severity high ./... || exit 1
+
+snyk auth ${SNYK_TOKEN} || exit 1
+snyk -org=nabbar monitor || exit 1
+snyk test || exit 1

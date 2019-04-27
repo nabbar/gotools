@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+go version || exit 1
+export PACKAGE_BIN=/usr/src/tools
+export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+
+echo -e "\n\t >>> Reformat sources..."
+
+for gofile in $(find . -type f -name '*.go' | grep -v '/vendor/' );
+do
+  echo -e "\t  |-> file : ${gofile}"
+  echo -e "\t  |     |-> go fmt... $(go fmt ${gofile})"
+  echo -e "\t  |     |-> goimports... $(goimports -w ${gofile})"
+done
+

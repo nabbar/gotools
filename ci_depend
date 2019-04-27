@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+go version || exit 1
+export PACKAGE_BIN=/usr/src/tools
+export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+
+[ -e Gopkg.toml ] || dep init
+
+dep ensure
+dep status || exit 1

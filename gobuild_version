@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+PACKAGE_PKG=${1}
+[ "${PACKAGE_PKG}" != "" ] || exit 1
+
+PACKAGE_MOD=${2}
+PACKAGE_DEP=${3}
+
+PACKAGE_CMD=${4}
+[ "${PACKAGE_CMD}" != "." ] || PACKAGE_CMD=""
+[ "${PACKAGE_CMD}" = "" ] || PACKAGE_CMD=$(echo "./${PACKAGE_CMD}")
+
+PACKAGE_VER=$(mktemp)
+wget --output-document=${PACKAGE_VER} https://api.github.com/repos/${PACKAGE_PKG}/releases/latest
+PACKAGE_TAG=$(cat ${PACKAGE_VER} | grep -i '"tag_name"' | grep -oP '(v[^"]*)')
+PACKAGE_PKG=github.com/${PACKAGE_PKG}
+
+go version
+
+[ ! -e ${GOPATH}/src/${PACKAGE_PKG} ] || rm -rf ${GOPATH}/src/${PACKAGE_PKG}
+[ -e $( dirname ${GOPATH}/src/${PACKAGE_PKG}) ] || mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG})
+
+git clone --recursive --branch ${PACKAGE_TAG} https://${PACKAGE_PKG}.git ${GOPATH}/src/${PACKAGE_PKG}
+
+cd ${GOPATH}/src/${PACKAGE_PKG}
+
+if [ "${PACKAGE_DEP}" != "off" ]
+then
+  echo -e "\n\n\n\t >>> dependancies : "
+  [ -e Gopkg.toml ] || dep init
+  dep ensure
+  dep status || exit 1
+fi
+
+if [ "${PACKAGE_MOD}" = "on" ]
+then
+  export GO111MODULE=on
+fi
+
+echo -e "\n\n\n\t >>> build : "
+go install -a -v ${PACKAGE_CMD} || exit 1
+
+echo -e "\n\n\n\t >>> Moving package : "
+mv -vf ${GOPATH}/bin/* ${PACKAGE_BIN}/ || exit 1

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+CURDIR=$(pwd)
+RUNDIR=$(dirname ${0})
+
+BUILD_REF=$(echo "dev-unknown")
+
+if [ -n "${TRAVIS_PULL_REQUEST_BRANCH}" ]
+then
+  BUILD_REF=${TRAVIS_PULL_REQUEST_BRANCH}
+fi
+
+if [ -n "${TRAVIS_BRANCH}" ] ;
+then 
+  BUILD_REF=${TRAVIS_BRANCH} 
+fi
+
+if [ -n "${TRAVIS_TAG}" ] 
+then
+  BUILD_REF=${TRAVIS_TAG}
+fi
+
+${RUNDIR}/ci_makeVersion ${TRAVIS_COMMIT} ${BUILD_REF} || exit 1
+

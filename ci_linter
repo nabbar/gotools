@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+go version || exit 1
+export PACKAGE_BIN=/usr/src/tools
+export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+
+golangci-lint run --no-config --skip-dirs="vendors" --color="always" --print-issued-lines --print-linter-name --issues-exit-code=0 --deadline=30m --disable-all --enable varcheck --enable unused --enable typecheck --enable structcheck --enable staticcheck --enable ineffassign --enable govet --enable gosimple --enable errcheck --enable deadcode --enable depguard --enable goconst --enable dupl --enable unconvert --enable unparam --enable scopelint --enable prealloc

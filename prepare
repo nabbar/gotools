@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+PACKAGE_BIN=/usr/src/tools
+SUDOCMD=$(which sudo)
+CURDIR=$(pwd)
+RUNDIR=$(dirname ${0})
+
+[ -e ${PACKAGE_BIN} ] || ${SUDOCMD} mkdir -vp ${PACKAGE_BIN} || exit 1
+[ "${USER}" = "root" ] || [ "${UID}" = "0" ] || ${SUDOCMD} chown -vR ${USER}:users ${PACKAGE_BIN} || exit 1
+
+if [ "$(which apt-get)" = "" ]
+then
+  ${SUDOCMD} $(which apk) add --no-cache wget curl openssl git tar jq || exit 1
+else
+  DEBIAN_FRONTEND=noninteractive ${SUDOCMD} $(which apt-get) --assume-yes update || exit 1
+  DEBIAN_FRONTEND=noninteractive ${SUDOCMD} $(which apt-get) --assume-yes -o Dpkg::Options::="--force-confold" --no-install-recommends install wget curl openssl git tar jq || exit 1
+fi
+
+echo -e "\n\n\n\t >>> get last release of 'github.com/snyk/snyk'... "
+${RUNDIR}/github_get_last_release 'snyk/snyk' 'linux' 'sha' || exit 1
+
+echo -e "\n\n\n\t >>> run gotools... "
+${RUNDIR}/gotools || exit 1
+
+${SUDOCMD} chmod -v +x ${PACKAGE_BIN}/*
+

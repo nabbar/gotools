@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+go version || exit 1
+export PACKAGE_BIN=/usr/src/tools
+export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+
+STATIC=$1
+PUBLIC=$2
+
+for FILEMD in $(find ./${STATIC} -type f -name '*.md');
+do
+  FILEHTML=$(echo "$(basename ${PUBLIC}${FILEMD#${STATIC}} '.md').html")
+  echo -e "\t>> Convert file ${FILEMD} to ${FILEHTML}"
+  markdown ${FILEMD} --embed --toc -o ${FILEHTML}
+done

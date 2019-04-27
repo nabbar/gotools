@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+export PACKAGE_BIN=/usr/src/tools
+export PATH=${PACKAGE_BIN}:${PATH}
+
+[ -e ${PACKAGE_BIN} ] || mkdir -vp ${PACKAGE_BIN}
+
+PACKAGE_PKG=${1}
+[ "${PACKAGE_PKG}" != "" ] || exit 1
+
+PACKAGE_KEY=${2}
+[ "${PACKAGE_KEY}" != "" ] || exit 1
+
+PACKAGE_NOT=${3}
+
+PACKAGE_VER=$(mktemp)
+wget --output-document=${PACKAGE_VER} https://api.github.com/repos/${PACKAGE_PKG}/releases/latest
+
+PACKAGE_TAG=$(cat ${PACKAGE_VER} | grep -i '"tag_name"' | grep -oP '(v[^"]*)')
+PACKAGE_URL=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | .browser_download_url" | tr -d '"')
+PACKAGE_OUT=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | .name" | tr -d '"')
+if [ "${PACKAGE_NOT}" != "" ]
+then
+  PACKAGE_URL=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | select(.name | contains(\"${PACKAGE_NOT}\") | not) | .browser_download_url" | tr -d '"')
+  PACKAGE_OUT=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | select(.name | contains(\"${PACKAGE_NOT}\") | not) | .name" | tr -d '"')
+fi
+
+wget --output-document=${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_URL}
+ln -svf ${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_BIN}/${PACKAGE_OUT}
+ln -svf ${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_BIN}/$(basename ${PACKAGE_PKG})
