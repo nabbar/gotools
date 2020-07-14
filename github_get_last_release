@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-export PACKAGE_BIN=/usr/src/tools
+export PACKAGE_BIN=$(echo ${PACKAGE_BIN})
+export SUDOCMD=$(echo ${SUDOCMD})
+export CURDIR=$(echo ${CURDIR})
+export RUNDIR=$(echo ${RUNDIR})
 export PATH=${PACKAGE_BIN}:${PATH}
 
-[ -e ${PACKAGE_BIN} ] || mkdir -vp ${PACKAGE_BIN}
+[ -e ${PACKAGE_BIN} ] || ${SUDOCMD} mkdir -vp ${PACKAGE_BIN} || exit 1
+${SUDOCMD} chown -vR ${USER}:users ${PACKAGE_BIN} || exit 1
 
 PACKAGE_PKG=${1}
 [ "${PACKAGE_PKG}" != "" ] || exit 1
@@ -26,5 +30,5 @@ then
 fi
 
 wget --output-document=${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_URL}
-ln -svf ${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_BIN}/${PACKAGE_OUT}
-ln -svf ${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_BIN}/$(basename ${PACKAGE_PKG})
+${SUDOCMD} ln -svf ${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_BIN}/${PACKAGE_OUT}
+${SUDOCMD} ln -svf ${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_BIN}/$(basename ${PACKAGE_PKG})

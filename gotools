@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
+set -x
 
 go version || exit 1
 
-export PACKAGE_BIN=/usr/src/tools
+export PACKAGE_BIN=$(echo ${PACKAGE_BIN})
+export SUDOCMD=$(echo ${SUDOCMD})
+export CURDIR=$(echo ${CURDIR})
+export RUNDIR=$(echo ${RUNDIR})
+
+export GOROOT=$(echo ${GOROOT})
+export GOPATH=$(echo ${GOPATH})
+
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
 
 [ -e ${PACKAGE_BIN} ] || mkdir -vp ${PACKAGE_BIN}
@@ -10,23 +18,20 @@ export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
 CURDIR=$(pwd)
 RUNDIR=$(dirname ${0})
 
-echo -e "\n\n\n\t >>> build tools 'github.com/golang/dep'... "
-${RUNDIR}/gobuild_version golang/dep off off cmd/dep || exit 1
-
 echo -e "\n\n\n\t >>> build tools 'golang.org/x/tools'... "
-${RUNDIR}/gobuild_repos golang.org/x/tools off on cmd/... github.com/golang/tools  || exit 1
+${RUNDIR}/gobuild_repos golang.org/x/tools cmd/... github.com/golang/tools  || exit 1
 
 echo -e "\n\n\n\t >>> build tools 'github.com/securego/gosec'... "
-${RUNDIR}/gobuild_repos github.com/securego/gosec off on cmd/gosec || exit 1
+${RUNDIR}/gobuild_repos github.com/securego/gosec cmd/gosec || exit 1
 
 echo -e "\n\n\n\t >>> build tools 'github.com/onsi/ginkgo'... "
-${RUNDIR}/gobuild_version onsi/ginkgo on on ginkgo || exit 1
+${RUNDIR}/gobuild_version onsi/ginkgo ginkgo || exit 1
 
 echo -e "\n\n\n\t >>> build tools 'github.com/golangci/golangci-lint'... "
-${RUNDIR}/gobuild_version golangci/golangci-lint on on cmd/golangci-lint || exit 1
+${RUNDIR}/gobuild_version golangci/golangci-lint cmd/golangci-lint || exit 1
 
 echo -e "\n\n\n\t >>> build tools 'github.com/gomarkdown/mdtohtml'... "
-${RUNDIR}/gobuild_repos github.com/gomarkdown/mdtohtml off on || exit 1
+${RUNDIR}/gobuild_repos github.com/gomarkdown/mdtohtml || exit 1
 
 echo -e "\n\n\n\t >>> build tools 'github.com/gobuffalo/packr/packr'... "
-${RUNDIR}/gobuild_version gobuffalo/packr on on packr || exit 1
+${RUNDIR}/gobuild_version gobuffalo/packr packr || exit 1

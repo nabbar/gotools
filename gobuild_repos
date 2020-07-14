@@ -1,42 +1,44 @@
 #!/usr/bin/env bash
+set -x
+
+export PACKAGE_BIN=$(echo ${PACKAGE_BIN})
+export SUDOCMD=$(echo ${SUDOCMD})
+export CURDIR=$(echo ${CURDIR})
+export RUNDIR=$(echo ${RUNDIR})
+
+export GOROOT=$(echo ${GOROOT})
+export GOPATH=$(echo ${GOPATH})
 
 PACKAGE_PKG=${1}
 [ "${PACKAGE_PKG}" != "" ] || exit 1
 
-PACKAGE_MOD=${2}
-PACKAGE_DEP=${3}
-
-PACKAGE_CMD=${4}
+PACKAGE_CMD=${2}
 [ "${PACKAGE_CMD}" != "." ] || PACKAGE_CMD=""
 [ "${PACKAGE_CMD}" = "" ] || PACKAGE_CMD=$(echo "./${PACKAGE_CMD}")
 
-PACKAGE_GIT=${5}
+PACKAGE_GIT=${3}
 [ "${PACKAGE_GIT}" != "" ] || PACKAGE_GIT=${PACKAGE_PKG}.git
 
-go version
+go version || exit 1
 
-[ ! -e ${GOPATH}/src/${PACKAGE_PKG} ] || rm -rf ${GOPATH}/src/${PACKAGE_PKG}
-[ -e $( dirname ${GOPATH}/src/${PACKAGE_PKG}) ] || mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG})
+[ ! -e ${GOPATH}/src/${PACKAGE_PKG} ] || rm -rf ${GOPATH}/src/${PACKAGE_PKG} || ${SUDOCMD} rm -rf ${GOPATH}/src/${PACKAGE_PKG} || exit 1
+[ -e $( dirname ${GOPATH}/src/${PACKAGE_PKG}) ] || mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG}) || ${SUDOCMD} mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG}) || exit 1
 
-git clone --recursive https://${PACKAGE_GIT} ${GOPATH}/src/${PACKAGE_PKG}
+git clone --recursive https://${PACKAGE_GIT} ${GOPATH}/src/${PACKAGE_PKG} || exit 1
 
-cd ${GOPATH}/src/${PACKAGE_PKG}
+cd ${GOPATH}/src/${PACKAGE_PKG} || exit 1
 
-if [ "${PACKAGE_DEP}" != "off" ]
-then
-  echo -e "\n\n\n\t >>> dependancies : "
-  [ -e Gopkg.toml ] || dep init
-  dep ensure
-  dep status || exit 1
-fi
-
-if [ "${PACKAGE_MOD}" = "on" ]
+if [ -e "go.mod" ]
 then
   export GO111MODULE=on
+  go mod download
+  go mod vendor
+else 
+  go get ./...
 fi
 
 echo -e "\n\n\n\t >>> build : "
 go install -a -v ${PACKAGE_CMD} || exit 1
 
 echo -e "\n\n\n\t >>> Moving package : "
-mv -vf ${GOPATH}/bin/* ${PACKAGE_BIN}/ || exit 1
+${SUDOCMD} mv -vf ${GOPATH}/bin/* ${PACKAGE_BIN}/ || exit 1
