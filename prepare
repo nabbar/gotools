@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 
 export PACKAGE_BIN=/usr/src/tools
 export SUDOCMD=$(which sudo)
@@ -10,17 +9,15 @@ export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
 
 GOPATH=${GOPATH}
-[ "${GOPATH}" != "" ] || export GOPATH=/go
-${SUDOCMD} mkdir -vp ${GOPATH}/src ${GOPATH}/bin ${GOPATH}/pkg || exit 1
-${SUDOCMD} chown -vR ${USER}:users ${GOPATH} || exit 1
-
-chown -R ${USER}:users ${GOPATH} || ${SUDOCMD} chown -R ${USER}:users ${GOPATH} || exit 1 
+[[ "${GOPATH}" != "" ]] || export GOPATH=/go
+mkdir -vp ${GOPATH}/src ${GOPATH}/bin ${GOPATH}/pkg || ${SUDOCMD} mkdir -vp ${GOPATH}/src ${GOPATH}/bin ${GOPATH}/pkg || exit 1
+chown -R ${USER}:users ${GOPATH} || ${SUDOCMD} chown -R ${USER}:users ${GOPATH} || exit 1
 chmod -R ug+rw ${GOPATH} || ${SUDOCMD} chmod -R ug+rw ${GOPATH} || exit 1
 
-[ -e ${PACKAGE_BIN} ] || ${SUDOCMD} mkdir -vp ${PACKAGE_BIN} || exit 1
-[ "${USER}" = "root" ] || [ "${UID}" = "0" ] || ${SUDOCMD} chown -vR ${USER}:users ${PACKAGE_BIN} || exit 1
+[[ -e ${PACKAGE_BIN} ]] || ${SUDOCMD} mkdir -vp ${PACKAGE_BIN} || exit 1
+[[ "${USER}" = "root" ]] || [[ "${UID}" = "0" ]] || ${SUDOCMD} chown -vR ${USER}:users ${PACKAGE_BIN} || exit 1
 
-if [ "$(which apt-get)" = "" ]
+if [[ "$(which apt-get)" = "" ]]
 then
   ${SUDOCMD} $(which apk) add --no-cache wget curl openssl git tar jq || exit 1
 else
@@ -35,4 +32,5 @@ echo -e "\n\n\n\t >>> run gotools... "
 ${RUNDIR}/gotools || exit 1
 
 ${SUDOCMD} chmod -v +x ${PACKAGE_BIN}/*
+ln -svf ${PACKAGE_BIN}/* /usr/local/bin/ || ${SUDOCMD} ln -svf ${PACKAGE_BIN}/* /usr/local/bin/ || exit 1
 

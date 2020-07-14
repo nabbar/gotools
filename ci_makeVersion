@@ -1,7 +1,14 @@
 #!/bin/bash
 go version || exit 1
+
+export GOROOT=$(echo ${GOROOT})
+export GOPATH=$(echo ${GOPATH})
+[[ "${GOPATH}" != "" ]] || export GOPATH=/go
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+export CC=${CC}
+export CGO_ENABLED=${CGO_ENABLED}
+export GO111MODULE=${GO111MODULE}
 
 exit_error() {
    echo -e "\n\n\t\tERROR: $1 !!"
@@ -17,25 +24,25 @@ BUILD_PKG=$3
 REPO_NAME=$(pwd)
 REPO_NAME=${REPO_NAME#${GOPATH}/src/}
 
-[ -e scripts ] || cd ..
-[ -e scripts ] || exit_error "cannot find root package path"
+[[ -e scripts ]] || cd ..
+[[ -e scripts ]] || exit_error "cannot find root package path"
 
 
-[ -n "${BUILD_HASH}" ] || BUILD_HASH=$(git rev-parse --verify HEAD | tr -d ' ' | tr -d '\n')
+[[ -n "${BUILD_HASH}" ]] || BUILD_HASH=$(git rev-parse --verify HEAD | tr -d ' ' | tr -d '\n')
 
 echo "${BUILD_HASH}" > BUILD_HASH
 
 BUILD_TAG=$(git describe --tags --exact-match ${BUILD_HASH} | tr -d ' ' | tr -d '\n')
-[ -n "${BUILD_TAG}" ] || BUILD_TAG=$(echo "dev-${BUILD_REF}")
-[ -n "${BUILD_TAG}" ] || BUILD_TAG=$(echo "dev-$(git branch --contains ${BUILD_HASH} --no-color --no-column | head -n 1 | tr -d '*' | tr -d ' ' | tr -d '\n')")
+[[ -n "${BUILD_TAG}" ]] || BUILD_TAG=$(echo "dev-${BUILD_REF}")
+[[ -n "${BUILD_TAG}" ]] || BUILD_TAG=$(echo "dev-$(git branch --contains ${BUILD_HASH} --no-color --no-column | head -n 1 | tr -d '*' | tr -d ' ' | tr -d '\n')")
 echo "${BUILD_TAG}" > BUILD_RELEASE
 
 BUILD_PACKAGE=${BUILD_PKG}
-[ -n "${BUILD_PACKAGE}" ] || BUILD_PACKAGE=$(basename $(pwd) | tr -d ' ' | tr -d '\n')
+[[ -n "${BUILD_PACKAGE}" ]] || BUILD_PACKAGE=$(basename $(pwd) | tr -d ' ' | tr -d '\n')
 echo "${BUILD_PACKAGE}" > BUILD_PACKAGE
 
 BUILD_DATE=$(git log -1 --format=%ci ${BUILD_HASH} | awk '{print $1"T"$2$3}' | tr -d ' ' | tr -d '\n')
-[ -n "${BUILD_DATE}" ] || BUILD_DATE=$(date --rfc-3339=seconds | awk '{print $1"T"$2$3}' | tr -d ' ' | tr -d '\n')
+[[ -n "${BUILD_DATE}" ]] || BUILD_DATE=$(date --rfc-3339=seconds | awk '{print $1"T"$2$3}' | tr -d ' ' | tr -d '\n')
 echo "${BUILD_DATE}" > BUILD_DATE
 
 BUILD_PARAMS="-X ${REPO_NAME}/version.Release=$(cat BUILD_RELEASE) -X ${REPO_NAME}/version.Build=$(cat BUILD_HASH) -X ${REPO_NAME}/version.Package=$(cat BUILD_PACKAGE) -X ${REPO_NAME}/version.Date=$(cat BUILD_DATE)"
@@ -49,12 +56,12 @@ echo -e "\t\t >>> Date=$(cat BUILD_DATE)"
 echo -e "\n\t\t >>> PARAMS Go Build : $(cat BUILD_PARAMS)"
 echo -e "\n\n"
 
-[ -n "${BUILD_HASH}" ] || exit_error "hash commit is empty"
-[ "${BUILD_TAG}" != "dev-" ] || exit_error "Release commit is empty"
-[ -n "${BUILD_TAG}" ] || exit_error "Release commit is empty"
-[ -n "${BUILD_DATE}" ] || exit_error "Date commit is empty"
-[ "${BUILD_DATE}" != "T" ] || exit_error "Date commit is empty"
-[ -n "${BUILD_PACKAGE}" ] || exit_error "Package commit is empty"
-[ -n "${REPO_NAME}" ] || exit_error "Package Repository Name is empty"
+[[ -n "${BUILD_HASH}" ]] || exit_error "hash commit is empty"
+[[ "${BUILD_TAG}" != "dev-" ]] || exit_error "Release commit is empty"
+[[ -n "${BUILD_TAG}" ]] || exit_error "Release commit is empty"
+[[ -n "${BUILD_DATE}" ]] || exit_error "Date commit is empty"
+[[ "${BUILD_DATE}" != "T" ]] || exit_error "Date commit is empty"
+[[ -n "${BUILD_PACKAGE}" ]] || exit_error "Package commit is empty"
+[[ -n "${REPO_NAME}" ]] || exit_error "Package Repository Name is empty"
 
 

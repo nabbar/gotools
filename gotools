@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 
 go version || exit 1
 
@@ -13,7 +12,7 @@ export GOPATH=$(echo ${GOPATH})
 
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
 
-[ -e ${PACKAGE_BIN} ] || mkdir -vp ${PACKAGE_BIN}
+[[ -e ${PACKAGE_BIN} ]] || mkdir -vp ${PACKAGE_BIN}
 
 CURDIR=$(pwd)
 RUNDIR=$(dirname ${0})

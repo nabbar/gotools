@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 go version || exit 1
+
+export GOROOT=$(echo ${GOROOT})
+export GOPATH=$(echo ${GOPATH})
+[[ "${GOPATH}" != "" ]] || export GOPATH=/go
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+export CC=${CC}
+export CGO_ENABLED=${CGO_ENABLED}
+export GO111MODULE=${GO111MODULE}
 
 STATIC=$1
 PUBLIC=$2
@@ -10,5 +17,7 @@ for FILEMD in $(find ./${STATIC} -type f -name '*.md');
 do
   FILEHTML=$(echo "$(basename ${PUBLIC}${FILEMD#${STATIC}} '.md').html")
   echo -e "\t>> Convert file ${FILEMD} to ${FILEHTML}"
-  markdown ${FILEMD} --embed --toc -o ${FILEHTML}
+  markdown ${FILEMD} --embed --toc -o ${FILEHTML} || exit 1
 done
+
+git status

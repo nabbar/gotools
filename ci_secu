@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 go version || exit 1
+
+export GOROOT=$(echo ${GOROOT})
+export GOPATH=$(echo ${GOPATH})
+[[ "${GOPATH}" != "" ]] || export GOPATH=/go
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+export CC=${CC}
+export CGO_ENABLED=${CGO_ENABLED}
+export GO111MODULE=${GO111MODULE}
 
-gosec -sort -severity low ./...
-gosec -sort -severity medium ./...
-gosec -sort -severity high ./... || exit 1
+gosec -sort ./...
 
-snyk auth ${SNYK_TOKEN} || exit 1
-snyk -org=nabbar monitor || exit 1
-snyk test || exit 1
+if [[ "${SNYK_TOKEN}" != "" ]];
+then
+  snyk auth ${SNYK_TOKEN} || exit 1
+  snyk -org=nabbar monitor || exit 1
+  snyk test || exit 1
+fi

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 
 export PACKAGE_BIN=$(echo ${PACKAGE_BIN})
 export SUDOCMD=$(echo ${SUDOCMD})
@@ -11,11 +10,11 @@ export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
 
 PACKAGE_PKG=${1}
-[ "${PACKAGE_PKG}" != "" ] || exit 1
+[[ "${PACKAGE_PKG}" != "" ]] || exit 1
 
 PACKAGE_CMD=${2}
-[ "${PACKAGE_CMD}" != "." ] || PACKAGE_CMD=""
-[ "${PACKAGE_CMD}" = "" ] || PACKAGE_CMD=$(echo "./${PACKAGE_CMD}")
+[[ "${PACKAGE_CMD}" != "." ]] || PACKAGE_CMD=""
+[[ "${PACKAGE_CMD}" = "" ]] || PACKAGE_CMD=$(echo "./${PACKAGE_CMD}")
 
 PACKAGE_VER=$(mktemp)
 wget --output-document=${PACKAGE_VER} https://api.github.com/repos/${PACKAGE_PKG}/releases/latest
@@ -24,24 +23,25 @@ PACKAGE_PKG=github.com/${PACKAGE_PKG}
 
 go version || exit 1
 
-[ ! -e ${GOPATH}/src/${PACKAGE_PKG} ] || rm -rf ${GOPATH}/src/${PACKAGE_PKG} || ${SUDOCMD} rm -rf ${GOPATH}/src/${PACKAGE_PKG} || exit 1
-[ -e $( dirname ${GOPATH}/src/${PACKAGE_PKG}) ] || mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG}) || ${SUDOCMD} mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG}) || exit 1
+[[ ! -e ${GOPATH}/src/${PACKAGE_PKG} ]] || rm -rf ${GOPATH}/src/${PACKAGE_PKG} || ${SUDOCMD} rm -rf ${GOPATH}/src/${PACKAGE_PKG} || exit 1
+[[ -e $( dirname ${GOPATH}/src/${PACKAGE_PKG}) ]] || mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG}) || ${SUDOCMD} mkdir -vp $(dirname ${GOPATH}/src/${PACKAGE_PKG}) || exit 1
 
 git clone --recursive --branch ${PACKAGE_TAG} https://${PACKAGE_PKG}.git ${GOPATH}/src/${PACKAGE_PKG} || exit 1
 
 cd ${GOPATH}/src/${PACKAGE_PKG} || exit 1
 
-if [ -e "go.mod" ]
+if [[ -e "go.mod" ]]
 then
   export GO111MODULE=on
   go mod download
   go mod vendor
-else 
+else
+  export GO111MODULE=off
   go get ./...
 fi
 
 echo -e "\n\n\n\t >>> build : "
-go install -a -v ${PACKAGE_CMD} || exit 1
+go install -a ${PACKAGE_CMD} || exit 1
 
 echo -e "\n\n\n\t >>> Moving package : "
 ${SUDOCMD} mv -vf ${GOPATH}/bin/* ${PACKAGE_BIN}/ || exit 1

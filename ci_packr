@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 go version || exit 1
+
+export GOROOT=$(echo ${GOROOT})
+export GOPATH=$(echo ${GOPATH})
+[[ "${GOPATH}" != "" ]] || export GOPATH=/go
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+export CC=${CC}
+export CGO_ENABLED=${CGO_ENABLED}
+export GO111MODULE=${GO111MODULE}
 
 packr clean -v
-packr -v -z
+packr -v -z || exit 1
+
+git status

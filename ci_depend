@@ -1,9 +1,23 @@
 #!/usr/bin/env bash
 go version || exit 1
+
+export GOROOT=$(echo ${GOROOT})
+export GOPATH=$(echo ${GOPATH})
+[[ "${GOPATH}" != "" ]] || export GOPATH=/go
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+export CC=${CC}
+export CGO_ENABLED=${CGO_ENABLED}
+export GO111MODULE=${GO111MODULE}
 
-[ -e Gopkg.toml ] || dep init
+[[ ! -e "go.mod" ]] || export GO111MODULE=on
+[[  -e "go.mod" ]] || export GO111MODULE=off
 
-dep ensure
-dep status || exit 1
+if [[ -e "go.mod" ]]
+then
+  go mod download || exit 1
+  go mod vendor || exit 1
+else 
+  go get ./... || exit 1
+fi
+
