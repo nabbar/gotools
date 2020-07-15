@@ -20,4 +20,9 @@ then
   done
 fi
 
-golangci-lint run --no-config ${PARAMS} --skip-dirs="vendors" --color="always" --print-issued-lines --print-linter-name --issues-exit-code=0 --deadline=30m --disable-all --enable varcheck --enable unused --enable typecheck --enable structcheck --enable staticcheck --enable ineffassign --enable govet --enable gosimple --enable errcheck --enable deadcode --enable depguard --enable goconst --enable dupl --enable unconvert --enable unparam --enable scopelint --enable prealloc
+if [[ -e ".golangci.yml" ]];
+then 
+  golangci-lint run 
+else 
+  golangci-lint run --no-config ${PARAMS} --skip-dirs="vendors" --color="always" --print-issued-lines --print-linter-name --issues-exit-code=0 --deadline=30m --enable-all --disable=gochecknoinits --disable=gochecknoglobals --disable=wsl --disable=golint --disable=gocritic --disable=stylecheck --disable=whitespace
+fi
