@@ -3,7 +3,9 @@ go version || exit 1
 
 export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
+
 [[ "${GOPATH}" != "" ]] || export GOPATH=/go
+
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
 export CC=${CC}
@@ -26,7 +28,6 @@ REPO_NAME=${REPO_NAME#${GOPATH}/src/}
 
 [[ -e scripts ]] || cd ..
 [[ -e scripts ]] || exit_error "cannot find root package path"
-
 
 [[ -n "${BUILD_HASH}" ]] || BUILD_HASH=$(git rev-parse --verify HEAD | tr -d ' ' | tr -d '\n')
 

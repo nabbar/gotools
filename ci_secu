@@ -3,7 +3,9 @@ go version || exit 1
 
 export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
+
 [[ "${GOPATH}" != "" ]] || export GOPATH=/go
+
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
 export CC=${CC}
@@ -19,5 +21,6 @@ if [[ "${SNYK_TOKEN}" != "" ]];
 then
   snyk -org=nabbar auth ${SNYK_TOKEN}
   snyk -org=nabbar monitor
-  snyk test
+  snyk test || exit $?
 fi
+

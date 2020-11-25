@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 go version || exit 1
-                                                                                                                                                                                                                                                  export PACKAGE_BIN=/usr/src/tools                                                                                                                                                                                                                 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
+
 export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
+
 [[ "${GOPATH}" != "" ]] || export GOPATH=/go
+
 export PACKAGE_BIN=/usr/src/tools
 export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
 export CC=${CC}
@@ -22,3 +24,4 @@ git status
 
 [ "$(git ls-files -m | wc -l)" = "0" ] || exit 1
 exit 0
+

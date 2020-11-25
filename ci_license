@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+echo -e "\n\t >>> Checking License into sources..."
+
+RES_LICENSE=0
+
+for PKG in $(find . -type f -name "*.go" | grep -v 'vendor/' | grep -v 'version/license_.*.go');
+do
+  if [ "$(head -n 25 $PKG | grep -c -P '[*\s]*MIT License')" != 1 ];
+  then
+    echo "Missing Licence: $PKG";
+    RES_LICENSE=1
+  fi;
+done;
+
+[ "${RES_LICENSE}" = "0" ] || exit 1
+exit 0
+
