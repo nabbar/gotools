@@ -4,7 +4,7 @@ go version || exit $?
 go mod download || exit $?
 go mod vendor || exit $?
 
-LISTFILE=$(git ls-files -m | grep -vp "^$")
+LISTFILE=$(git ls-files -m | grep -vP "^$")
 
 export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
@@ -26,10 +26,10 @@ do
   goimports -w ${gofile}
 done
 
-FRMFILE=$(git ls-files -m | grep -vp "^$")
+FRMFILE=$(git ls-files -m | grep -vP "^$")
 for PKG in ${LISTFILE}
 do
-  FRMFILE=$(echo -ne "${FRMFILE}" | grep -vP "^${PKG}$" | grep -vp "^$")
+  FRMFILE=$(echo -ne "${FRMFILE}" | grep -vP "^${PKG}$" | grep -vP "^$")
 done
 
 if [[ "$(echo -ne "${FRMFILE}" | wc -l)" != "0" ]]
