@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-go version || exit 1
+
+go version || exit $?
+go mod download || exit $?
+go mod vendor || exit $?
+
+LISTFILE=$(git ls-files -m | grep -vp "^$")
 
 export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
@@ -16,12 +21,23 @@ echo -e "\n\t >>> Reformat sources..."
 
 for gofile in $(find . -type f -name '*.go' | grep -v '/vendor/' );
 do
+  echo -e "Checking Format file ${gofile}..."
   go fmt ${gofile}
   goimports -w ${gofile}
 done
 
-git status
+FRMFILE=$(git ls-files -m | grep -vp "^$")
+for PKG in ${LISTFILE}
+do
+  FRMFILE=$(echo -ne "${FRMFILE}" | grep -vP "^${PKG}$" | grep -vp "^$")
+done
 
-[ "$(git ls-files -m | wc -l)" = "0" ] || exit 1
+if [[ "$(echo -ne "${FRMFILE}" | wc -l)" != "0" ]]
+then
+  echo -e "\n\n\t>>> This file need to be formatted with gofmt & goimports ($(echo -ne "${FRMFILE}" | wc -l) files impacted): "
+  echo -e "${FRMFILE}"
+  echo -e "\n\n"
+  exit 1
+fi
+
 exit 0
-
