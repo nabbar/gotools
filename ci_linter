@@ -24,8 +24,10 @@ fi
 
 if [[ -e ".golangci.yml" ]];
 then 
+  set -x
   golangci-lint run 
 else 
+  set -x
   golangci-lint run --no-config ${PARAMS} --skip-dirs="vendors" --color="always" --print-issued-lines --print-linter-name --issues-exit-code=0 --deadline=30m --enable-all --disable=gochecknoinits --disable=gochecknoglobals --disable=wsl --disable=golint --disable=gocritic --disable=stylecheck --disable=whitespace
 fi
 
