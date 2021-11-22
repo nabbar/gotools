@@ -29,8 +29,8 @@ ${RUNDIR}/gobuild_version onsi/ginkgo ginkgo || exit 1
 echo -e "\n\n\n\t >>> build tools 'github.com/golangci/golangci-lint'... "
 ${RUNDIR}/gobuild_version golangci/golangci-lint cmd/golangci-lint || exit 1
 
-echo -e "\n\n\n\t >>> build tools 'github.com/gomarkdown/mdtohtml'... "
-${RUNDIR}/gobuild_repos github.com/gomarkdown/mdtohtml || exit 1
+#echo -e "\n\n\n\t >>> build tools 'github.com/gomarkdown/mdtohtml'... "
+#${RUNDIR}/gobuild_repos github.com/gomarkdown/mdtohtml || exit 1
 
-echo -e "\n\n\n\t >>> build tools 'github.com/gobuffalo/packr/packr'... "
-${RUNDIR}/gobuild_version gobuffalo/packr packr || exit 1
+#echo -e "\n\n\n\t >>> build tools 'github.com/gobuffalo/packr/packr'... "
+#${RUNDIR}/gobuild_version gobuffalo/packr packr || exit 1
