@@ -12,8 +12,7 @@ export CC=${CC}
 export CGO_ENABLED=${CGO_ENABLED}
 export GO111MODULE=${GO111MODULE}
 
-packr2 clean -v
-packr2 -v $@|| exit 1
+packr2 -v $@ || exit 1
 
 git status
 
