@@ -26,7 +26,7 @@ else
 fi
 
 echo -e "\n\n\n\t >>> get last release of 'github.com/snyk/snyk'... "
-${RUNDIR}/github_get_last_release 'snyk/snyk' 'linux' 'sha' || exit 1
+${RUNDIR}/github_get_last_release 'snyk/snyk' 'linux' 'sha|arm' || exit 1
 
 echo -e "\n\n\n\t >>> run gotools... "
 ${RUNDIR}/gotools || exit 1
