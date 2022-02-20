@@ -24,10 +24,15 @@ PACKAGE_TAG=$(cat ${PACKAGE_VER} | grep -i '"tag_name"' | grep -oP '(v[^"]*)')
 PACKAGE_URL=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | .browser_download_url" | tr -d '"')
 PACKAGE_OUT=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | .name" | tr -d '"')
 
+#if [[ "${PACKAGE_NOT}" != "" ]]
+#then
+#  PACKAGE_URL=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | select(.name | contains(\"${PACKAGE_NOT}\") | not) | .browser_download_url" | tr -d '"')
+#  PACKAGE_OUT=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | select(.name | contains(\"${PACKAGE_NOT}\") | not) | .name" | tr -d '"')
+#fi
 if [[ "${PACKAGE_NOT}" != "" ]]
 then
-  PACKAGE_URL=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | select(.name | contains(\"${PACKAGE_NOT}\") | not) | .browser_download_url" | tr -d '"')
-  PACKAGE_OUT=$(cat ${PACKAGE_VER} | jq ".assets[] | select (.name | contains(\"${PACKAGE_KEY}\")) | select(.name | contains(\"${PACKAGE_NOT}\") | not) | .name" | tr -d '"')
+  PACKAGE_URL=$(echo -e "${PACKAGE_URL}" | grep -v -P "${PACKAGE_NOT}")
+  PACKAGE_OUT=$(echo -e "${PACKAGE_OUT}" | grep -v -P "${PACKAGE_NOT}")
 fi
 
 wget --output-document=${PACKAGE_BIN}/${PACKAGE_OUT}-${PACKAGE_TAG} ${PACKAGE_URL}
