@@ -11,6 +11,7 @@ export PATH=${PACKAGE_BIN}:${GOPATH}/bin:${PATH}
 export CC=${CC}
 export CGO_ENABLED=${CGO_ENABLED}
 export GO111MODULE=${GO111MODULE}
+export GOAMD64=v4
 
 if [[ ! -e "go.mod" ]]
 then
