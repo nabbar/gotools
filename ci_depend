@@ -12,14 +12,12 @@ export CC=${CC}
 export CGO_ENABLED=${CGO_ENABLED}
 export GO111MODULE=${GO111MODULE}
 
-[[ ! -e "go.mod" ]] || export GO111MODULE=on
-[[  -e "go.mod" ]] || export GO111MODULE=off
-
-if [[ -e "go.mod" ]]
+if [[ ! -e "go.mod" ]]
 then
-  go mod download || exit 1
-  go mod vendor || exit 1
-else 
-  go get ./... || exit 1
+  go mod init
+  go mod tidy -go=1.17
+  go mod tidy -go=1.18
 fi
 
+go mod download
+go mod vendor
