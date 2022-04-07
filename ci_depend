@@ -19,5 +19,5 @@ then
   go mod tidy -go=1.18
 fi
 
-go mod download
+go mod download all
 go mod vendor
