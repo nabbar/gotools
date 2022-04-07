@@ -7,9 +7,6 @@ export RUNDIR=$(dirname ${0})
 
 export GOROOT=$(echo ${GOROOT})
 export GOPATH=$(echo ${GOPATH})
-export GOARCH=amd64
-export GOOS=linux
-export GOAMD64=v4
 
 GOPATH=${GOPATH}
 [[ "${GOPATH}" != "" ]] || export GOPATH=/go
