@@ -19,7 +19,7 @@ export GO111MODULE=${GO111MODULE}
 
 echo -e "\n\t >>> Reformat sources..."
 
-for gofile in $(find . -type f -name '*.go' | grep -v '/vendor/' );
+for gofile in $(find . -type f -name '*.go' | grep -v '/vendor/' | grep -v '/test/' );
 do
   echo -e "Checking Format file ${gofile}..."
   go fmt ${gofile}
