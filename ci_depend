@@ -20,5 +20,6 @@ then
   go mod tidy 
 fi
 
+go mod tidy
 go mod download all
 go mod vendor
